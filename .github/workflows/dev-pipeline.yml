@@ -14,4 +14,32 @@ jobs:
         exec -l $SHELL
         gcloud init
 
+    - name: Authenticate with Google Cloud Platform
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Pull Docker image from Docker Hub
+      run: docker pull joaquinreyero12/users:86fde4f
+      
+    - name: Tag Docker image for Google Container Registry
+      run: |
+        docker tag joaquinreyero12/users:86fde4f gcr.io/crested-primacy-413823/users-test
+        
+    - name: Authenticate Docker to Google Container Registry
+      run: gcloud auth configure-docker
+
+    - name: Push Docker image to Google Container Registry
+      run: docker push gcr.io/crested-primacy-413823/users-test
+
+    - name: Deploy To Google Cloud
+      run: |
+        gcloud run deploy users-test \
+          --image gcr.io/crested-primacy-413823/users-test\
+          --platform managed \
+          --region us-east1 \
+          --allow-unauthenticated \
+          --add-cloudsql-instances crested-primacy-413823:us-central1:users \
+          --project crested-primacy-413823
+
 
