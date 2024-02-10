@@ -1,1 +1,17 @@
+name: My Workflow
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Google Cloud SDK
+      run: |
+        curl https://sdk.cloud.google.com | bash
+        exec -l $SHELL
+        gcloud init
+
 
